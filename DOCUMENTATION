@@ -1,0 +1,42 @@
+My project name : NonStopable chat
+Type of project : omnichannel messaging and communication platform
+PURPOSE:
+    NonStopable chat is there to allow user to send and receive message across multiple communication platform 
+    (WhatsApp,Messenger,Instagram,etc) while using single dashboard
+PROBLEM STATEMENT WILL SOLVE:
+        People use many messaging apps:
+                  .whatsapp
+                  .instagram
+                  .facebook
+        Bussiness struggle to:
+                    .Reply fast
+                    .manage many platform
+                    .track customer
+                    .Automate res
+SOLUTION:
+      NonStopable chat come as solution to solve those problem above,therefore 
+     I will connect all messaging APIs into unified dashboard
+     USERS:
+         login once
+         .connect to all account
+
+FEATURES:
+     1.User registration
+     2.User login
+     3.Messaging board
+     4.search board
+     5.notification board
+     6.home page
+     7.profile board
+     8.more board
+  TECHNOLOGY:
+        FRONTEND:
+             .React(vite)
+             .css for styling
+        BACKEND:
+              .Mongoose
+              .Mongodb
+              .Express
+              .Node.js
+            
+
