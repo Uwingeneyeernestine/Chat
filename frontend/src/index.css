@@ -1,4 +1,4 @@
-body{
+/*body{
     margin: 0;
     background-color: hsl(208, 36%, 92%);
 }
@@ -66,4 +66,395 @@ form{
     position: fixed;
     top: 0;
     width: 100%;
+}*/
+img{
+   width: 60px;
+   height: 40px;
+    border-radius: 20px;
+    margin-left: 140px;
+    animation: translat 2s ease-in-out 0.5s infinite;
+    
+    
+}
+div{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 80px;
+}
+.many{
+    margin-top: 40px;
+    display: block;
+    justify-content: center;
+    margin-left: 90px;
+    flex-direction: column;
+    
+}
+.conne{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#sms{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+     width: 120px;
+   height: 90px;
+    border-radius: 20px;
+   transform: translate(-50%,-50%);
+    animation: translat 2s ease-in-out 0.5s infinite;
+     animation: translate 5s ease-in-out 0.5s infinite alternate-reverse;
+}
+
+/* MAI Logo at bottom */
+.mai-logo-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+.mai-logo {
+    width: 80px;
+    height: 60px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #006837, #009245);
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 104, 55, 0.4);
+}
+
+/* Platform icons base styling */
+.platform {
+    margin: 10px;
+    cursor: pointer;
+}
+
+/* SMS Logo styling */
+.sms-logo {
+    width: 80px;
+    height: 60px;
+}
+
+/* 
+   ANIMATION - Platform moves TO and MERGES INTO SMS, then SMS goes to MAI
+   1. Platform moves to SMS (center) - MERGES INTO IT
+   2. SMS then moves to MAI (bottom) - carries the message
+   3. While SMS goes to MAI, platform reappears at top (loop)
+   4. After all done, MAI sends back through SMS to platforms
+   
+   Total cycle: 48 seconds
+*/
+
+/* Platform 1 - Instagram */
+.platform-1 {
+    animation: platform1ToSms 48s ease-in-out infinite;
+}
+
+/* Platform 2 - X */
+.platform-2 {
+    animation: platform2ToSms 48s ease-in-out infinite;
+    animation-delay: 4s;
+}
+
+/* Platform 3 - Facebook */
+.platform-3 {
+    animation: platform3ToSms 48s ease-in-out infinite;
+    animation-delay: 8s;
+}
+
+/* Platform 4 - Call */
+.platform-4 {
+    animation: platform4ToSms 48s ease-in-out infinite;
+    animation-delay: 12s;
+}
+
+/* Platform 5 - Business */
+.platform-5 {
+    animation: platform5ToSms 48s ease-in-out infinite;
+    animation-delay: 16s;
+}
+
+/* Platform 6 - WhatsApp */
+.platform-6 {
+    animation: platform6ToSms 48s ease-in-out infinite;
+    animation-delay: 20s;
+}
+
+/* 
+   Platform moves TO SMS (center) - MERGES IN (disappears), 
+   then reappears at top while SMS carries message to MAI
+*/
+
+@keyframes platform1ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    /* Move TO and MERGE INTO SMS */
+    5% {
+        transform: translate(80px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    /* Fully merged into SMS */
+    8% {
+        transform: translate(80px, 80px) scale(0);
+        opacity: 0;
+    }
+    /* Stay hidden while SMS goes to MAI */
+    40% {
+        transform: translate(80px, 80px) scale(0);
+        opacity: 0;
+    }
+    /* Reappear at top when MAI sends back */
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    /* Wait for next cycle */
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes platform2ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    5% {
+        transform: translate(20px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    8% {
+        transform: translate(20px, 80px) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translate(20px, 80px) scale(0);
+        opacity: 0;
+    }
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes platform3ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    5% {
+        transform: translate(-40px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    8% {
+        transform: translate(-40px, 80px) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translate(-40px, 80px) scale(0);
+        opacity: 0;
+    }
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes platform4ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    5% {
+        transform: translate(-80px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    8% {
+        transform: translate(-80px, 80px) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translate(-80px, 80px) scale(0);
+        opacity: 0;
+    }
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes platform5ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    5% {
+        transform: translate(60px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    8% {
+        transform: translate(60px, 80px) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translate(60px, 80px) scale(0);
+        opacity: 0;
+    }
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes platform6ToSms {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    5% {
+        transform: translate(-20px, 80px) scale(0.1);
+        opacity: 1;
+    }
+    8% {
+        transform: translate(-20px, 80px) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translate(-20px, 80px) scale(0);
+        opacity: 0;
+    }
+    45% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+/* SMS Logo - moves to MAI after receiving from platform */
+.sms-logo {
+    animation: smsToMai 48s ease-in-out infinite;
+}
+
+@keyframes smsToMai {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 1 merges in - SMS glows */
+    5% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    /* SMS carries to MAI */
+    10% {
+        transform: translate(-50%, 50%) scale(1);
+        opacity: 1;
+    }
+    /* At MAI */
+    15% {
+        transform: translate(-50%, 50%) scale(1.5);
+        opacity: 1;
+    }
+    /* Wait */
+    40% {
+        transform: translate(-50%, 50%) scale(1);
+        opacity: 1;
+    }
+    /* MAI sends back - SMS goes to center */
+    45% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    /* Sends to platform 1 */
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    55% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 2 */
+    55% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 3 */
+    60% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    65% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 4 */
+    65% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 5 */
+    70% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    75% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    /* Platform 6 */
+    75% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+}
+
+@keyframes translate{
+    
+    100%{transform: translate(-50%,50%);}
+    50%{transform: translate(-80%,50%);}
+    0%{transform: translate(-50%,50%);}
+}
+@keyframes translat{
+    100%{transform: translate(70px);}
 }

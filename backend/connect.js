@@ -14,14 +14,15 @@ process.on('uncaughtException',(err,data)=>{
  MongoClient.connect(url,{useUnifiedTopology: true},(err,res)=>{
     if(err){
         console.log('database error');
+    } else {
+       db = res.db('sign');
+       const user = {"name":"Ernestine","pass":"it's me"};
+        db.collection('users').insertOne(user,(err,res)=>{  
+        if(err){
+            console.log('database error');
+            return;
+        }
+        console.log(res);
+        });
     }
-   db = res.db('sign');
-   const user = {"name":"Ernestine","pass":"it's me"};
-    db.collection('users').insertOne(user,(err,res)=>{  
-    if(err){
-        console.log('database error');
-        return;
-    }
-    console.log(res);
-    });
 });
