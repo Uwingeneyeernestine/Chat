@@ -25,7 +25,7 @@ function Page() {
       
       if (!smsElement || !logoElement) return;
       
-      // Get initial positions
+      // Get positions
       const smsRect = smsElement.getBoundingClientRect();
       const logoRect = logoElement.getBoundingClientRect();
       const smsCenter = {
@@ -35,6 +35,12 @@ function Page() {
       const logoCenter = {
         x: logoRect.left + logoRect.width / 2,
         y: logoRect.top + logoRect.height / 2
+      };
+
+      // Calculate delta (how far to move)
+      const smsToLogoDelta = {
+        x: logoCenter.x - smsCenter.x,
+        y: logoCenter.y - smsCenter.y
       };
 
       // Store original positions for all platforms
@@ -56,21 +62,17 @@ function Page() {
         
         if (!platformEl) continue;
 
-        // Step 1: Platform moves to SMS - COVERS it
+        // Calculate platform to SMS delta
+        const platformToSmsDelta = {
+          x: smsCenter.x - pos.x,
+          y: smsCenter.y - pos.y
+        };
+
+        // Step 1: Platform moves to SMS center using transform
         const movePlatformToSms = new Promise((resolve) => {
-          platformEl.style.position = "fixed";
-          platformEl.style.left = `${pos.x}px`;
-          platformEl.style.top = `${pos.y}px`;
-          platformEl.style.transform = "translate(-50%, -50%)";
+          platformEl.style.transition = "transform 0.8s ease-in-out";
           platformEl.style.zIndex = "1000";
-          
-          // Trigger reflow
-          platformEl.offsetHeight;
-          
-          // Move to SMS (covers it)
-          platformEl.style.transition = "all 0.8s ease-in-out";
-          platformEl.style.left = `${smsCenter.x}px`;
-          platformEl.style.top = `${smsCenter.y}px`;
+          platformEl.style.transform = `translate(calc(-50% + ${platformToSmsDelta.x}px), calc(-50% + ${platformToSmsDelta.y}px))`;
           
           setTimeout(() => {
             resolve();
@@ -79,21 +81,11 @@ function Page() {
 
         await movePlatformToSms;
         
-        // Step 2: SMS moves to logo - COVERS it (same as platform covers SMS)
+        // Step 2: SMS moves to logo using transform (doesn't affect layout)
         const moveSmsToLogo = new Promise((resolve) => {
-          smsElement.style.position = "fixed";
-          smsElement.style.left = `${smsCenter.x}px`;
-          smsElement.style.top = `${smsCenter.y}px`;
-          smsElement.style.transform = "translate(-50%, -50%)";
-          smsElement.style.zIndex = "1000"; // COVERS logo (same as platform covers SMS)
-          smsElement.style.transition = "all 0.8s ease-in-out";
-          
-          // Trigger reflow
-          smsElement.offsetHeight;
-          
-          // Move to logo (covers it)
-          smsElement.style.left = `${logoCenter.x}px`;
-          smsElement.style.top = `${logoCenter.y}px`;
+          smsElement.style.transition = "transform 0.8s ease-in-out";
+          smsElement.style.zIndex = "2000";
+          smsElement.style.transform = `translate(calc(-50% + ${smsToLogoDelta.x}px), calc(-50% + ${smsToLogoDelta.y}px))`;
           
           setTimeout(() => {
             resolve();
@@ -105,43 +97,34 @@ function Page() {
         // Brief pause at logo
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Step 3: Platform returns
+        // Step 3: Platform returns to original position
         const returnPlatform = new Promise((resolve) => {
-          platformEl.style.transition = "all 0.6s ease-in-out";
-          platformEl.style.left = `${pos.x}px`;
-          platformEl.style.top = `${pos.y}px`;
+          platformEl.style.transition = "transform 0.6s ease-in-out";
+          platformEl.style.transform = "translate(-50%, -50%)";
           
           setTimeout(() => {
             // Reset platform styles
-            platformEl.style.position = "";
-            platformEl.style.left = "";
-            platformEl.style.top = "";
-            platformEl.style.transform = "";
             platformEl.style.zIndex = "";
             platformEl.style.transition = "";
+            platformEl.style.transform = "";
             resolve();
           }, 700);
         });
 
         await returnPlatform;
         
-        // Step 4: SMS resets
+        // Step 4: SMS returns to original position
         const resetSms = new Promise((resolve) => {
-          smsElement.style.transition = "all 0.5s ease-in-out";
-          smsElement.style.left = `${smsCenter.x}px`;
-          smsElement.style.top = `${smsCenter.y}px`;
+          smsElement.style.transition = "transform 0.6s ease-in-out";
           smsElement.style.transform = "translate(-50%, -50%)";
           
           setTimeout(() => {
             // Reset SMS styles
-            smsElement.style.position = "";
-            smsElement.style.left = "";
-            smsElement.style.top = "";
-            smsElement.style.transform = "";
             smsElement.style.zIndex = "";
             smsElement.style.transition = "";
+            smsElement.style.transform = "";
             resolve();
-          }, 600);
+          }, 700);
         });
         
         await resetSms;
@@ -157,7 +140,7 @@ function Page() {
     }, 500);
 
     // Make animation infinite
-    const totalCycleTime = 24000;
+    const totalCycleTime = 26000;
     const interval = setInterval(() => {
       animateSequence();
     }, totalCycleTime);
@@ -169,26 +152,39 @@ function Page() {
   }, []);
 
   return (
-    <div className="animation-container">
-      <div className="platforms-row">
-        {platforms.map((platform, index) => (
-          <img 
-            key={platform.id}
-            id={platform.id}
-            src={platform.src} 
-            alt={platform.alt} 
-            className={`platform platform-${index + 1}`} 
-          />
-        ))}
+    <div className="page-wrapper">
+      {/* Top corner buttons */}
+      <div className="auth-buttons">
+        <button className="btn-login">Login</button>
+        <button className="btn-register">Register</button>
       </div>
-      
-      <div className="conne" id="sms">
-        <img src={Sms} alt="message" className="sms-logo" />
+
+      <div className="animation-container">
+        <div className="platforms-row">
+          {platforms.map((platform, index) => (
+            <img 
+              key={platform.id}
+              id={platform.id}
+              src={platform.src} 
+              alt={platform.alt} 
+              className={`platform platform-${index + 1}`} 
+            />
+          ))}
+        </div>
+        
+        <div className="conne" id="sms">
+          <img src={Sms} alt="message" className="sms-logo" />
+        </div>
+        
+        <div className="mai-logo-container">
+          <img src={Logo} alt="MAI Chat" className="mai-logo" />
+        </div>
       </div>
-      
-      <div className="mai-logo-container">
-        <img src={Logo} alt="MAI Chat" className="mai-logo" />
-      </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p>ernestine@2026 chat</p>
+      </footer>
     </div>
   );
 }
