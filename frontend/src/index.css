@@ -1,460 +1,57 @@
-/*body{
-    margin: 0;
-    background-color: hsl(208, 36%, 92%);
-}
-img{
-    
-    width: 150px;
-    height: 50px;
-    
-}
-.logo{
-    display: flex;
-    justify-content: center ;
-    background-color: hsl(160, 100%, 85%);
-}
-.link{
-    position: fixed;
-    width: 190px;
-    margin-top: -50px;
-    height: 100vh;
-    background-color: hsl(60, 20%, 99%);
-}
-.link a{
-    text-decoration: none;
-}
-li{
-    margin-top: 55px;
-}
-#end{
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-.container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 10px;
-}
-.bt{
-    display: flex;
-    justify-content: center;
-}
-button{
-    height: 30px;
-    width: 80px;
-    border: none;
-    border-radius: 5px;
-}
-input{
-    width: 100%;
-}
-form{
-    background-color: azure;
-    padding: 50px;
-    border-radius: 7px;
-    box-shadow: 5px 5px 25px  rgb(26, 25, 25);
-}
-.h1{
-    text-align: center;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    color: hsl(0, 1%, 50%);
-}
-#start{
-    position: fixed;
-    top: 0;
-    width: 100%;
-}*/
-img{
-   width: 60px;
-   height: 40px;
-    border-radius: 20px;
-    margin-left: 140px;
-    animation: translat 2s ease-in-out 0.5s infinite;
-    
-    
-}
-div{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    margin-bottom: 80px;
-}
-.many{
-    margin-top: 40px;
-    display: block;
-    justify-content: center;
-    margin-left: 90px;
-    flex-direction: column;
-    
-}
-.conne{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-#sms{
-    position: fixed;
-    left: 50%;
-    top: 50%;
-     width: 120px;
-   height: 90px;
-    border-radius: 20px;
-   transform: translate(-50%,-50%);
-    animation: translat 2s ease-in-out 0.5s infinite;
-     animation: translate 5s ease-in-out 0.5s infinite alternate-reverse;
+/* Animation container - centered layout */
+.animation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 60px;
 }
 
-/* MAI Logo at bottom */
+/* Platforms row */
+.platforms-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Base styles for the platform images */
+.platform {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.platform:hover {
+  transform: scale(1.1);
+}
+
+/* SMS container */
+.conne {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.sms-logo {
+  width: 80px;
+  height: 80px;
+}
+
+/* Logo container */
 .mai-logo-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mai-logo {
-    width: 80px;
-    height: 60px;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #006837, #009245);
-    padding: 10px;
-    box-shadow: 0 4px 15px rgba(0, 104, 55, 0.4);
-}
-
-/* Platform icons base styling */
-.platform {
-    margin: 10px;
-    cursor: pointer;
-}
-
-/* SMS Logo styling */
-.sms-logo {
-    width: 80px;
-    height: 60px;
-}
-
-/* 
-   LOOP ANIMATION - Platform moves to SMS, then to MAI, original goes back up
-   1. Platform moves to SMS (REACHES it)
-   2. Duplicate moves from SMS to MAI
-   3. Original goes back up (loop)
-   4. After all done, MAI sends back to platforms
-   
-   Total cycle: 48 seconds
-*/
-
-/* Platform 1 - Instagram */
-.platform-1 {
-    animation: loopToSmsToMai1 48s ease-in-out infinite;
-}
-
-/* Platform 2 - X */
-.platform-2 {
-    animation: loopToSmsToMai2 48s ease-in-out infinite;
-    animation-delay: 4s;
-}
-
-/* Platform 3 - Facebook */
-.platform-3 {
-    animation: loopToSmsToMai3 48s ease-in-out infinite;
-    animation-delay: 8s;
-}
-
-/* Platform 4 - Call */
-.platform-4 {
-    animation: loopToSmsToMai4 48s ease-in-out infinite;
-    animation-delay: 12s;
-}
-
-/* Platform 5 - Business */
-.platform-5 {
-    animation: loopToSmsToMai5 48s ease-in-out infinite;
-    animation-delay: 16s;
-}
-
-/* Platform 6 - WhatsApp */
-.platform-6 {
-    animation: loopToSmsToMai6 48s ease-in-out infinite;
-    animation-delay: 20s;
-}
-
-/* Platform 1 - Instagram Loop */
-@keyframes loopToSmsToMai1 {
-    0% {
-        transform: translate(0, 0);
-    }
-    /* REACH SMS (center) */
-    5% {
-        transform: translate(80px, 80px);
-    }
-    /* At SMS - duplicate goes to MAI */
-    8% {
-        transform: translate(80px, 80px);
-    }
-    /* Duplicate reaches MAI */
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    /* Original goes back up (LOOP) */
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    /* Wait for all platforms */
-    40% {
-        transform: translate(0, 0);
-    }
-    /* MAI sends back to SMS */
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    /* SMS back to platform */
-    55% {
-        transform: translate(80px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* Platform 2 - X Loop */
-@keyframes loopToSmsToMai2 {
-    0% {
-        transform: translate(0, 0);
-    }
-    5% {
-        transform: translate(20px, 80px);
-    }
-    8% {
-        transform: translate(20px, 80px);
-    }
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    40% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    55% {
-        transform: translate(20px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* Platform 3 - Facebook Loop */
-@keyframes loopToSmsToMai3 {
-    0% {
-        transform: translate(0, 0);
-    }
-    5% {
-        transform: translate(-40px, 80px);
-    }
-    8% {
-        transform: translate(-40px, 80px);
-    }
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    40% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    55% {
-        transform: translate(-40px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* Platform 4 - Call Loop */
-@keyframes loopToSmsToMai4 {
-    0% {
-        transform: translate(0, 0);
-    }
-    5% {
-        transform: translate(-80px, 80px);
-    }
-    8% {
-        transform: translate(-80px, 80px);
-    }
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    40% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    55% {
-        transform: translate(-80px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* Platform 5 - Business Loop */
-@keyframes loopToSmsToMai5 {
-    0% {
-        transform: translate(0, 0);
-    }
-    5% {
-        transform: translate(60px, 80px);
-    }
-    8% {
-        transform: translate(60px, 80px);
-    }
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    40% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    55% {
-        transform: translate(60px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* Platform 6 - WhatsApp Loop */
-@keyframes loopToSmsToMai6 {
-    0% {
-        transform: translate(0, 0);
-    }
-    5% {
-        transform: translate(-20px, 80px);
-    }
-    8% {
-        transform: translate(-20px, 80px);
-    }
-    15% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    15.01% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    40% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(0px, 280px);
-        opacity: 0;
-    }
-    55% {
-        transform: translate(-20px, 80px);
-    }
-    60% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-/* SMS Logo Animation */
-.sms-logo {
-    animation: smsLoop 48s ease-in-out infinite;
-}
-
-@keyframes smsLoop {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    /* Platform 1 reaches SMS */
-    5% {
-        transform: translate(-50%, -50%) scale(1.3);
-    }
-    /* Going to MAI */
-    15% {
-        transform: translate(-50%, 30%) scale(1);
-    }
-    /* At MAI */
-    20% {
-        transform: translate(-50%, 30%) scale(1.3);
-    }
-    /* Wait */
-    40% {
-        transform: translate(-50%, 30%) scale(1);
-    }
-    /* Back from MAI */
-    50% {
-        transform: translate(-50%, -50%) scale(1.3);
-    }
-    /* Sending to platforms */
-    60% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-@keyframes translate{
-    
-    100%{transform: translate(-50%,50%);}
-    50%{transform: translate(-80%,50%);}
-    0%{transform: translate(-50%,50%);}
-}
-@keyframes translat{
-    100%{transform: translate(70px);}
+  width: 100px;
+  height: 100px;
+  position: relative;
+  z-index: 1;
 }
