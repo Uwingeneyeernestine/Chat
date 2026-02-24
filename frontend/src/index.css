@@ -28,12 +28,15 @@
   transform: scale(1.1);
 }
 
-/* SMS container */
+/* SMS container - fixed from start so it doesn't affect layout */
 .conne {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 10;
 }
 
@@ -52,6 +55,5 @@
 .mai-logo {
   width: 100px;
   height: 100px;
-  position: relative;
   z-index: 1;
 }

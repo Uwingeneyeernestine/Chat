@@ -49,14 +49,14 @@ function Page() {
         };
       }).filter(Boolean);
 
-      // Animate each platform - NO OVERLAPPING
+      // Animate each platform
       for (let i = 0; i < platformPositions.length; i++) {
         const pos = platformPositions[i];
         const platformEl = document.getElementById(pos.id);
         
         if (!platformEl) continue;
 
-        // Step 1: Platform moves to SMS
+        // Step 1: Platform moves to SMS - COVERS it
         const movePlatformToSms = new Promise((resolve) => {
           platformEl.style.position = "fixed";
           platformEl.style.left = `${pos.x}px`;
@@ -67,7 +67,7 @@ function Page() {
           // Trigger reflow
           platformEl.offsetHeight;
           
-          // Move in straight line to SMS
+          // Move to SMS (covers it)
           platformEl.style.transition = "all 0.8s ease-in-out";
           platformEl.style.left = `${smsCenter.x}px`;
           platformEl.style.top = `${smsCenter.y}px`;
@@ -77,51 +77,35 @@ function Page() {
           }, 900);
         });
 
-        // Wait for platform to reach SMS FIRST
         await movePlatformToSms;
         
-        // Step 2: SMS moves toward logo - FIRST goes BEHIND (lower z-index)
-        const moveSmsBehindLogo = new Promise((resolve) => {
+        // Step 2: SMS moves to logo - COVERS it (same as platform covers SMS)
+        const moveSmsToLogo = new Promise((resolve) => {
           smsElement.style.position = "fixed";
           smsElement.style.left = `${smsCenter.x}px`;
           smsElement.style.top = `${smsCenter.y}px`;
           smsElement.style.transform = "translate(-50%, -50%)";
-          smsElement.style.zIndex = "5"; // BEHIND logo (logo has z-index: 10)
-          smsElement.style.transition = "all 0.5s ease-in-out";
+          smsElement.style.zIndex = "1000"; // COVERS logo (same as platform covers SMS)
+          smsElement.style.transition = "all 0.8s ease-in-out";
           
           // Trigger reflow
           smsElement.offsetHeight;
           
-          // Move to logo position
+          // Move to logo (covers it)
           smsElement.style.left = `${logoCenter.x}px`;
           smsElement.style.top = `${logoCenter.y}px`;
           
           setTimeout(() => {
             resolve();
-          }, 600);
+          }, 900);
         });
 
-        await moveSmsBehindLogo;
-        
-        // Step 3: SMS wraps around - comes to FRONT of logo
-        const wrapSmsAroundLogo = new Promise((resolve) => {
-          smsElement.style.zIndex = "100"; // FRONT of logo
-          smsElement.style.transition = "all 0.3s ease-in-out";
-          
-          // Small scale animation to show wrapping
-          smsElement.style.transform = "translate(-50%, -50%) scale(1.1)";
-          
-          setTimeout(() => {
-            resolve();
-          }, 400);
-        });
-
-        await wrapSmsAroundLogo;
+        await moveSmsToLogo;
         
         // Brief pause at logo
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Step 4: Platform returns (AFTER SMS wraps)
+        // Step 3: Platform returns
         const returnPlatform = new Promise((resolve) => {
           platformEl.style.transition = "all 0.6s ease-in-out";
           platformEl.style.left = `${pos.x}px`;
@@ -139,10 +123,9 @@ function Page() {
           }, 700);
         });
 
-        // Wait for platform to return FIRST
         await returnPlatform;
         
-        // Step 5: SMS resets (AFTER platform is done)
+        // Step 4: SMS resets
         const resetSms = new Promise((resolve) => {
           smsElement.style.transition = "all 0.5s ease-in-out";
           smsElement.style.left = `${smsCenter.x}px`;
@@ -161,21 +144,20 @@ function Page() {
           }, 600);
         });
         
-        // Wait for SMS to reset FIRST
         await resetSms;
         
-        // Brief pause before next platform starts
+        // Brief pause before next platform
         await new Promise(resolve => setTimeout(resolve, 200));
       }
     };
 
-    // Start animation after a short delay to ensure elements are rendered
+    // Start animation after a short delay
     const timer = setTimeout(() => {
       animateSequence();
     }, 500);
 
-    // Make animation infinite - wait for ALL to finish, then start again
-    const totalCycleTime = 24000; // ~24 seconds - wait for WhatsApp to complete
+    // Make animation infinite
+    const totalCycleTime = 24000;
     const interval = setInterval(() => {
       animateSequence();
     }, totalCycleTime);
@@ -188,7 +170,6 @@ function Page() {
 
   return (
     <div className="animation-container">
-      {/* Platforms row */}
       <div className="platforms-row">
         {platforms.map((platform, index) => (
           <img 
@@ -201,12 +182,10 @@ function Page() {
         ))}
       </div>
       
-      {/* SMS container */}
       <div className="conne" id="sms">
         <img src={Sms} alt="message" className="sms-logo" />
       </div>
       
-      {/* Logo container */}
       <div className="mai-logo-container">
         <img src={Logo} alt="MAI Chat" className="mai-logo" />
       </div>
