@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Ig from "./assets/ig.png";
 import Sms from "./assets/sms.png";
 import X from "./assets/x.png"; 
@@ -7,8 +7,14 @@ import Call from "./assets/call.png";
 import Bussiness from "./assets/business.png";
 import Whatsapp from "./assets/whatsapp.png";
 import Logo from "./assets/logo.svg";
+import Login from "./sign.jsx";
+import Signup from "./signup.jsx";
 
 function Page() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const loginRef = useRef(null);
+  
   const platforms = [
     { id: "platform-ig", src: Ig, alt: "instagram" },
     { id: "platform-x", src: X, alt: "twitter" },
@@ -18,16 +24,53 @@ function Page() {
     { id: "platform-whatsapp", src: Whatsapp, alt: "whatsapp" },
   ];
 
+  // Handle click outside to close login/register
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (loginRef.current && !loginRef.current.contains(event.target)) {
+        setShowLogin(false);
+        setShowRegister(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLoginClick = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+  };
+
+  const handleRegisterClick = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+  };
+
+  const handleSwitchToRegister = () => {
+    setShowLogin(false);
+    setShowRegister(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setShowRegister(false);
+    setShowLogin(true);
+  };
+
   useEffect(() => {
     const animateSequence = async () => {
       const smsElement = document.getElementById("sms");
+      const logoElement = document.querySelector(".mai-logo");
       
-      if (!smsElement) return;
+      if (!smsElement || !logoElement) return;
       
-      // Get SMS position
+      // Get positions
       const smsRect = smsElement.getBoundingClientRect();
+      const logoRect = logoElement.getBoundingClientRect();
       const smsCenterX = smsRect.left + smsRect.width / 2;
       const smsCenterY = smsRect.top + smsRect.height / 2;
+      const logoCenterX = logoRect.left + logoRect.width / 2;
+      const logoCenterY = logoRect.top + logoRect.height / 2;
 
       // Store platform original positions
       const platformPositions = platforms.map(p => {
@@ -48,11 +91,11 @@ function Page() {
         
         if (!platformEl) continue;
 
-        // Calculate diagonal distance to SMS (oblique line)
+        // Calculate
         const moveX = smsCenterX - pos.centerX;
         const moveY = smsCenterY - pos.centerY;
 
-        // Step 1: Platform moves diagonally/obliquely to SMS
+        // Step 1: Platform moves diagonally to SMS
         const movePlatformToSms = new Promise((resolve) => {
           platformEl.style.transition = "transform 1s ease-in-out";
           platformEl.style.zIndex = "1000";
@@ -65,11 +108,15 @@ function Page() {
 
         await movePlatformToSms;
         
-        // Step 2: SMS moves down to logo
+        // Step 2: SMS moves to logo using transform (keeps document flow)
         const moveSmsToLogo = new Promise((resolve) => {
+          // Calculate the offset from SMS to logo
+          const smsToLogoX = logoCenterX - smsCenterX;
+          const smsToLogoY = logoCenterY - smsCenterY;
+          
           smsElement.style.transition = "transform 0.8s ease-in-out";
           smsElement.style.zIndex = "2000";
-          smsElement.style.transform = "translateY(120px)";
+          smsElement.style.transform = `translate(${smsToLogoX}px, ${smsToLogoY}px)`;
           
           setTimeout(() => {
             resolve();
@@ -96,10 +143,10 @@ function Page() {
 
         await returnPlatform;
         
-        // Step 4: SMS returns to original position
+        // Step 4: SMS returns to original position using transform
         const resetSms = new Promise((resolve) => {
           smsElement.style.transition = "transform 0.6s ease-in-out";
-          smsElement.style.transform = "translateY(0)";
+          smsElement.style.transform = "translate(0, 0)";
           
           setTimeout(() => {
             smsElement.style.zIndex = "";
@@ -136,9 +183,19 @@ function Page() {
   return (
     <div className="page-wrapper">
       {/* Top corner buttons */}
-      <div className="auth-buttons">
-        <button className="btn-login">Login</button>
-        <button className="btn-register">Register</button>
+      <div className="auth-buttons" ref={loginRef}>
+        <button className="btn-login" onClick={handleLoginClick}>Login</button>
+        {showLogin && (
+          <div className="login-popup">
+            <Login onSwitchToRegister={handleSwitchToRegister} />
+          </div>
+        )}
+        <button className="btn-register" onClick={handleRegisterClick}>Register</button>
+        {showRegister && (
+          <div className="login-popup">
+            <Signup onSwitchToLogin={handleSwitchToLogin} />
+          </div>
+        )}
       </div>
 
       <div className="animation-container">
@@ -154,10 +211,12 @@ function Page() {
           ))}
         </div>
         
+        {/* SMS is now above logo */}
         <div className="conne" id="sms">
           <img src={Sms} alt="message" className="sms-logo" />
         </div>
         
+        {/* Logo is now at the bottom */}
         <div className="mai-logo-container">
           <img src={Logo} alt="MAI Chat" className="mai-logo" />
         </div>
