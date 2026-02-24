@@ -21,37 +21,23 @@ function Page() {
   useEffect(() => {
     const animateSequence = async () => {
       const smsElement = document.getElementById("sms");
-      const logoElement = document.querySelector(".mai-logo");
       
-      if (!smsElement || !logoElement) return;
+      if (!smsElement) return;
       
-      // Get positions
+      // Get SMS position
       const smsRect = smsElement.getBoundingClientRect();
-      const logoRect = logoElement.getBoundingClientRect();
-      const smsCenter = {
-        x: smsRect.left + smsRect.width / 2,
-        y: smsRect.top + smsRect.height / 2
-      };
-      const logoCenter = {
-        x: logoRect.left + logoRect.width / 2,
-        y: logoRect.top + logoRect.height / 2
-      };
+      const smsCenterX = smsRect.left + smsRect.width / 2;
+      const smsCenterY = smsRect.top + smsRect.height / 2;
 
-      // Calculate delta (how far to move)
-      const smsToLogoDelta = {
-        x: logoCenter.x - smsCenter.x,
-        y: logoCenter.y - smsCenter.y
-      };
-
-      // Store original positions for all platforms
+      // Store platform original positions
       const platformPositions = platforms.map(p => {
         const el = document.getElementById(p.id);
         if (!el) return null;
         const rect = el.getBoundingClientRect();
         return {
           id: p.id,
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
+          centerX: rect.left + rect.width / 2,
+          centerY: rect.top + rect.height / 2
         };
       }).filter(Boolean);
 
@@ -62,30 +48,28 @@ function Page() {
         
         if (!platformEl) continue;
 
-        // Calculate platform to SMS delta
-        const platformToSmsDelta = {
-          x: smsCenter.x - pos.x,
-          y: smsCenter.y - pos.y
-        };
+        // Calculate diagonal distance to SMS (oblique line)
+        const moveX = smsCenterX - pos.centerX;
+        const moveY = smsCenterY - pos.centerY;
 
-        // Step 1: Platform moves to SMS center using transform
+        // Step 1: Platform moves diagonally/obliquely to SMS
         const movePlatformToSms = new Promise((resolve) => {
-          platformEl.style.transition = "transform 0.8s ease-in-out";
+          platformEl.style.transition = "transform 1s ease-in-out";
           platformEl.style.zIndex = "1000";
-          platformEl.style.transform = `translate(calc(-50% + ${platformToSmsDelta.x}px), calc(-50% + ${platformToSmsDelta.y}px))`;
+          platformEl.style.transform = `translate(${moveX}px, ${moveY}px)`;
           
           setTimeout(() => {
             resolve();
-          }, 900);
+          }, 1100);
         });
 
         await movePlatformToSms;
         
-        // Step 2: SMS moves to logo using transform (doesn't affect layout)
+        // Step 2: SMS moves down to logo
         const moveSmsToLogo = new Promise((resolve) => {
           smsElement.style.transition = "transform 0.8s ease-in-out";
           smsElement.style.zIndex = "2000";
-          smsElement.style.transform = `translate(calc(-50% + ${smsToLogoDelta.x}px), calc(-50% + ${smsToLogoDelta.y}px))`;
+          smsElement.style.transform = "translateY(120px)";
           
           setTimeout(() => {
             resolve();
@@ -100,10 +84,9 @@ function Page() {
         // Step 3: Platform returns to original position
         const returnPlatform = new Promise((resolve) => {
           platformEl.style.transition = "transform 0.6s ease-in-out";
-          platformEl.style.transform = "translate(-50%, -50%)";
+          platformEl.style.transform = "translate(0, 0)";
           
           setTimeout(() => {
-            // Reset platform styles
             platformEl.style.zIndex = "";
             platformEl.style.transition = "";
             platformEl.style.transform = "";
@@ -116,10 +99,9 @@ function Page() {
         // Step 4: SMS returns to original position
         const resetSms = new Promise((resolve) => {
           smsElement.style.transition = "transform 0.6s ease-in-out";
-          smsElement.style.transform = "translate(-50%, -50%)";
+          smsElement.style.transform = "translateY(0)";
           
           setTimeout(() => {
-            // Reset SMS styles
             smsElement.style.zIndex = "";
             smsElement.style.transition = "";
             smsElement.style.transform = "";
@@ -140,7 +122,7 @@ function Page() {
     }, 500);
 
     // Make animation infinite
-    const totalCycleTime = 26000;
+    const totalCycleTime = 28000;
     const interval = setInterval(() => {
       animateSequence();
     }, totalCycleTime);
