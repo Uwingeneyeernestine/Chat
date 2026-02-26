@@ -1,7 +1,7 @@
 const {MongoClient} = require('mongodb');
 
 const url = 'mongodb://localhost:27017';
-db = '';
+let db = '';
 
 
 process.on('uncaughtException',(err,data)=>{

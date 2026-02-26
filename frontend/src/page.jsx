@@ -9,8 +9,9 @@ import Whatsapp from "./assets/whatsapp.png";
 import Logo from "./assets/logo.svg";
 import Login from "./sign.jsx";
 import Signup from "./signup.jsx";
+import { Header, Footer, Bar } from "./Layout.jsx";
 
-function Page() {
+function Page({ onLoginSuccess }) {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const loginRef = useRef(null);
@@ -182,18 +183,22 @@ function Page() {
 
   return (
     <div className="page-wrapper">
+
       {/* Top corner buttons */}
       <div className="auth-buttons" ref={loginRef}>
         <button className="btn-login" onClick={handleLoginClick}>Login</button>
         {showLogin && (
           <div className="login-popup">
-            <Login onSwitchToRegister={handleSwitchToRegister} />
+            <Login onSwitchToRegister={handleSwitchToRegister} onLoginSuccess={onLoginSuccess} />
           </div>
         )}
         <button className="btn-register" onClick={handleRegisterClick}>Register</button>
         {showRegister && (
-          <div className="login-popup">
-            <Signup onSwitchToLogin={handleSwitchToLogin} />
+          <div className="login-popup register-popup">
+            <Signup onSwitchToLogin={handleSwitchToLogin} onSignupSuccess={() => {
+              setShowRegister(false);
+              setShowLogin(true);
+            }} />
           </div>
         )}
       </div>
@@ -222,10 +227,8 @@ function Page() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="footer">
-        <p>ernestine@2026 chat</p>
-      </footer>
+      {/* Footer component */}
+      <Footer />
     </div>
   );
 }
