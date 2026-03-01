@@ -32,6 +32,21 @@ function App() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  
+  // Settings state
+  const [settingsUsername, setSettingsUsername] = useState("");
+  const [settingsDisplayName, setSettingsDisplayName] = useState("");
+  const [settingsBio, setSettingsBio] = useState("");
+  const [settingsProfilePic, setSettingsProfilePic] = useState(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameSuccess, setUsernameSuccess] = useState("");
+  
+  const API_URL = `http://${window.location.hostname}:3001`;
 
   // Restore session from localStorage on initial load
   useEffect(() => {
@@ -46,6 +61,10 @@ function App() {
       setDisplayName(savedDisplayName || savedUsername);
       setBio(savedBio || "");
       setProfilePic(savedProfilePic);
+      setSettingsUsername(savedUsername);
+      setSettingsDisplayName(savedDisplayName || savedUsername);
+      setSettingsBio(savedBio || "");
+      setSettingsProfilePic(savedProfilePic);
       setActiveContent(savedActiveContent || "welcome");
       setIsLoggedIn(true);
       
@@ -56,6 +75,30 @@ function App() {
     }
     setIsLoading(false);
   }, []);
+
+  // Fetch user profile from database on login
+  const fetchUserProfile = async (user) => {
+    try {
+      const response = await fetch(`${API_URL}/api/user/${user}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.displayName) {
+          setDisplayName(data.displayName);
+          setSettingsDisplayName(data.displayName);
+        }
+        if (data.bio) {
+          setBio(data.bio);
+          setSettingsBio(data.bio);
+        }
+        if (data.profilePic) {
+          setProfilePic(data.profilePic);
+          setSettingsProfilePic(data.profilePic);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
+  };
 
   // Save session to localStorage whenever state changes
   useEffect(() => {
@@ -89,8 +132,12 @@ function App() {
     setIsLoggedIn(true);
     setUsername(user);
     setDisplayName(user);
+    setSettingsUsername(user);
+    setSettingsDisplayName(user);
     localStorage.setItem('chat_username', user);
     localStorage.setItem('chat_displayName', user);
+    // Fetch profile from database
+    fetchUserProfile(user);
   };
 
   const handleLogoutClick = () => {
@@ -105,6 +152,14 @@ function App() {
     setProfilePic(null);
     setActiveContent("welcome");
     setShowLogoutModal(false);
+    // Clear settings state
+    setSettingsUsername("");
+    setSettingsDisplayName("");
+    setSettingsBio("");
+    setSettingsProfilePic(null);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
     // Clear localStorage
     localStorage.removeItem('chat_username');
     localStorage.removeItem('chat_displayName');
@@ -136,6 +191,7 @@ function App() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePic(reader.result);
+        setSettingsProfilePic(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -144,6 +200,124 @@ function App() {
   const handleSaveProfile = () => {
     setIsEditingProfile(false);
     alert("Profile updated successfully!");
+  };
+
+  // Save settings to database
+  const handleSaveSettings = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/user/${username}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          displayName: settingsDisplayName,
+          bio: settingsBio,
+          profilePic: settingsProfilePic
+        })
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setDisplayName(settingsDisplayName);
+        setBio(settingsBio);
+        setProfilePic(settingsProfilePic);
+        alert("Settings saved successfully!");
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to save settings");
+      }
+    } catch (err) {
+      console.error('Error saving settings:', err);
+      alert("Failed to save settings");
+    }
+  };
+
+  // Change password
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    setPasswordSuccess("");
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError("All password fields are required");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters");
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/api/user/${username}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setPasswordSuccess(data.message);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setPasswordError(data.error);
+      }
+    } catch (err) {
+      console.error('Error changing password:', err);
+      setPasswordError("Failed to change password");
+    }
+  };
+
+  // Change username
+  const handleChangeUsername = async () => {
+    setUsernameError("");
+    setUsernameSuccess("");
+    
+    if (!settingsUsername) {
+      setUsernameError("Username is required");
+      return;
+    }
+    
+    if (settingsUsername === username) {
+      setUsernameError("New username must be different from current");
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/api/user/${username}/username`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          newUsername: settingsUsername
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUsernameSuccess(data.message);
+        setUsername(data.newUsername);
+        setDisplayName(data.newUsername);
+        localStorage.setItem('chat_username', data.newUsername);
+        localStorage.setItem('chat_displayName', data.newUsername);
+        // Update socket connection with new username
+        window.location.reload();
+      } else {
+        setUsernameError(data.error);
+      }
+    } catch (err) {
+      console.error('Error changing username:', err);
+      setUsernameError("Failed to change username");
+    }
   };
 
   const renderContent = () => {
@@ -236,19 +410,69 @@ function App() {
         return (
           <div className="settings-container">
             <h2>Settings</h2>
+            
+            <div className="settings-section">
+              <h3>Change Username</h3>
+              <div className="setting-item">
+                <label>Current Username</label>
+                <input type="text" value={username} disabled />
+              </div>
+              <div className="setting-item">
+                <label>New Username</label>
+                <input 
+                  type="text" 
+                  value={settingsUsername}
+                  onChange={(e) => setSettingsUsername(e.target.value)}
+                  placeholder="Enter new username"
+                />
+              </div>
+              {usernameError && <p className="error-message">{usernameError}</p>}
+              {usernameSuccess && <p className="success-message">{usernameSuccess}</p>}
+              <button className="save-btn" onClick={handleChangeUsername}>Change Username</button>
+            </div>
+            
+            <div className="settings-section">
+              <h3>Change Password</h3>
+              <div className="setting-item">
+                <label>Current Password</label>
+                <input 
+                  type="password" 
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div className="setting-item">
+                <label>New Password</label>
+                <input 
+                  type="password" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div className="setting-item">
+                <label>Confirm New Password</label>
+                <input 
+                  type="password" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              {passwordError && <p className="error-message">{passwordError}</p>}
+              {passwordSuccess && <p className="success-message">{passwordSuccess}</p>}
+              <button className="save-btn" onClick={handleChangePassword}>Change Password</button>
+            </div>
+            
             <div className="settings-section">
               <h3>Profile Settings</h3>
-              <div className="setting-item">
-                <label>Username</label>
-                <input type="text" defaultValue={username} disabled />
-                <small>Username cannot be changed</small>
-              </div>
               <div className="setting-item">
                 <label>Display Name</label>
                 <input 
                   type="text" 
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  value={settingsDisplayName}
+                  onChange={(e) => setSettingsDisplayName(e.target.value)}
                   placeholder="Enter your display name"
                 />
               </div>
@@ -256,18 +480,15 @@ function App() {
                 <label>Bio</label>
                 <textarea 
                   placeholder="Tell us about yourself..."
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
+                  value={settingsBio}
+                  onChange={(e) => setSettingsBio(e.target.value)}
                 ></textarea>
               </div>
-              <button className="save-btn" onClick={() => alert("Settings saved!")}>Save Changes</button>
-            </div>
-            
-            <div className="settings-section">
-              <h3>Change Profile Picture</h3>
               <div className="setting-item">
                 <div className="profile-pic-preview">
-                  {profilePic ? (
+                  {settingsProfilePic ? (
+                    <img src={settingsProfilePic} alt="Profile" className="preview-img" />
+                  ) : profilePic ? (
                     <img src={profilePic} alt="Profile" className="preview-img" />
                   ) : (
                     <img src={UserIcon} alt="Profile" className="preview-img" />
@@ -283,6 +504,7 @@ function App() {
                   Choose Photo
                 </label>
               </div>
+              <button className="save-btn" onClick={handleSaveSettings}>Save All Changes</button>
             </div>
           </div>
         );

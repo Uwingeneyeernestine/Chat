@@ -265,8 +265,7 @@
   text-align: center;
   padding: 0px;
   background-color: #f5f5f5;
-  margin-bottom: 0px; /* Add margin to ensure footer is visible */
-  
+  margin-bottom: 0px;
 }
 .logo-footer {
   width: 30px;
@@ -340,13 +339,14 @@ body {
   color: #333;
 }
 
-/* Content area next to sidebar */
+/* Content area next to sidebar - SCROLLABLE */
 .content-area {
   margin-left: 200px;
   flex: 1;
   padding: 20px;
   min-height: calc(100vh - 110px);
   width: calc(100% - 240px);
+  overflow-y: auto;
 }
 
 /* Footer at bottom */
@@ -480,13 +480,14 @@ body {
   font-size: 16px;
 }
 
-/* Profile Container - Fits body, keeps header */
+/* Profile Container - SCROLLABLE */
 .profile-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   height: calc(100vh - 110px);
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .profile-header {
@@ -555,17 +556,40 @@ body {
   color: #666;
 }
 
-/* Settings Container */
+/* Settings Container - Scrollable */
 .settings-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 110px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Webkit scrollbar styling */
+.settings-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-container::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.settings-container::-webkit-scrollbar-thumb {
+  background-color: #295596;
+  border-radius: 4px;
 }
 
 .settings-container h2 {
   color: #295596;
   font-size: 24px;
   margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 10px 0;
+  z-index: 10;
 }
 
 .settings-section {
@@ -573,6 +597,7 @@ body {
   border-radius: 10px;
   padding: 25px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .settings-section h3 {
@@ -581,6 +606,25 @@ body {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid #295596;
+}
+
+/* Error and Success Messages */
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 5px;
+}
+
+.success-message {
+  color: #4CAF50;
+  font-size: 14px;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #e8f5e9;
+  border-radius: 5px;
 }
 
 .setting-item {
@@ -840,9 +884,9 @@ body {
 }
 
 .preview-img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .upload-pic-btn {

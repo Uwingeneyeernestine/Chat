@@ -18,7 +18,7 @@ const url = 'mongodb://localhost:27017';
 const PORT = 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Store connected users - username to socketId mapping
 const connectedUsers = new Map();
@@ -297,6 +297,164 @@ app.get('/api/search', async (req, res) => {
     res.status(200).json({ users: filteredUsers });
   } catch (err) {
     console.error('Search error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get user profile by username
+app.get('/api/user/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db('sign');
+    
+    const user = await db.collection('users').findOne(
+      { username },
+      { projection: { password: 0 } } // Exclude password
+    );
+    
+    await client.close();
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Get user error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user profile (bio, displayName, profilePic)
+app.put('/api/user/:username/profile', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { displayName, bio, profilePic } = req.body;
+    
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db('sign');
+    
+    const updateFields = {};
+    if (displayName !== undefined) updateFields.displayName = displayName;
+    if (bio !== undefined) updateFields.bio = bio;
+    if (profilePic !== undefined) updateFields.profilePic = profilePic;
+    
+    const result = await db.collection('users').updateOne(
+      { username },
+      { $set: updateFields }
+    );
+    
+    await client.close();
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    console.error('Update profile error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Change password with current password verification
+app.put('/api/user/:username/password', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current password and new password are required' });
+    }
+    
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db('sign');
+    
+    // Find user
+    const user = await db.collection('users').findOne({ username });
+    
+    if (!user) {
+      await client.close();
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      await client.close();
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+    
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Update password
+    await db.collection('users').updateOne(
+      { username },
+      { $set: { password: hashedNewPassword } }
+    );
+    
+    await client.close();
+    
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Change password error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Change username
+app.put('/api/user/:username/username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { newUsername } = req.body;
+    
+    if (!newUsername) {
+      return res.status(400).json({ error: 'New username is required' });
+    }
+    
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db('sign');
+    
+    // Check if new username already exists
+    const existingUser = await db.collection('users').findOne({ username: newUsername });
+    if (existingUser) {
+      await client.close();
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    // Update username
+    const result = await db.collection('users').updateOne(
+      { username },
+      { $set: { username: newUsername } }
+    );
+    
+    if (result.matchedCount === 0) {
+      await client.close();
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Also update messages to reflect new username
+    await db.collection('messages').updateMany(
+      { from: username },
+      { $set: { from: newUsername } }
+    );
+    await db.collection('messages').updateMany(
+      { to: username },
+      { $set: { to: newUsername } }
+    );
+    
+    await client.close();
+    
+    res.status(200).json({ message: 'Username changed successfully', newUsername });
+  } catch (err) {
+    console.error('Change username error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
